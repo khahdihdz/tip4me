@@ -315,36 +315,6 @@ class StorageService {
     }
   }
 
-  loginWithGithubDemo(username = 'hoangminh-dev'): AdminUser {
-    const user: AdminUser = {
-      id: `gh_${Date.now()}`,
-      username: username,
-      avatar_url: 'https://github.com/identicons/app.png',
-      role: 'admin',
-      authenticatedVia: 'github',
-    };
-    localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(user));
-    this.addLog('ADMIN_LOGIN', `Quản trị viên @${username} đăng nhập qua GitHub OAuth`, 'ADMIN');
-    return user;
-  }
-
-  loginWithSecretToken(token: string): AdminUser | null {
-    // Allows admin123 or matches sepayApiKey or predefined token
-    const settings = this.getSettings();
-    if (token === 'admin123' || token === settings.sepayApiKey || token === 'bmc-secret-2026') {
-      const user: AdminUser = {
-        id: `adm_${Date.now()}`,
-        username: 'Admin Root',
-        role: 'admin',
-        authenticatedVia: 'token',
-      };
-      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(user));
-      this.addLog('ADMIN_LOGIN', 'Quản trị viên đăng nhập bằng Secret Key', 'ADMIN');
-      return user;
-    }
-    return null;
-  }
-
   logoutAdmin(): void {
     const user = this.getAdminSession();
     if (user) {
