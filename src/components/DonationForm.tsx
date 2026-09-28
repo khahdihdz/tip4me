@@ -19,6 +19,63 @@ interface DonationFormProps {
 
 const PRESET_OPTIONS = [1, 3, 5, 10];
 
+const formatVNDInput = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
+  return Number(digits).toLocaleString('vi-VN');
+};
+
+const parseCustomAmount = (value: string): number => {
+  if (!value) return 0;
+  return Number(value.replace(/\D/g, '')) || 0;
+};
+
+const vietnameseNumberToWords = (value: number): string => {
+  const n = Math.floor(Math.abs(value));
+  if (!Number.isFinite(n) || n === 0) return 'không đồng';
+  if (n > 999_999_999_999_999) return 'Số tiền quá lớn';
+
+  const digits = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+  const readGroup = (num: number, full: boolean): string => {
+    const hundred = Math.floor(num / 100);
+    const ten = Math.floor((num % 100) / 10);
+    const unit = num % 10;
+    const parts: string[] = [];
+    if (hundred > 0 || full) parts.push(digits[hundred], 'trăm');
+    if (ten > 1) {
+      parts.push(digits[ten], 'mươi');
+      if (unit === 1) parts.push('mốt');
+      else if (unit === 5) parts.push('lăm');
+      else if (unit > 0) parts.push(digits[unit]);
+    } else if (ten === 1) {
+      parts.push('mười');
+      if (unit === 5) parts.push('lăm');
+      else if (unit > 0) parts.push(digits[unit]);
+    } else if (unit > 0) {
+      if (hundred > 0 || full) parts.push('lẻ');
+      parts.push(digits[unit]);
+    }
+    return parts.join(' ');
+  };
+
+  const units = ['', ' nghìn', ' triệu', ' tỷ', ' nghìn tỷ'];
+  const groups: number[] = [];
+  let remaining = n;
+  while (remaining > 0) {
+    groups.push(remaining % 1000);
+    remaining = Math.floor(remaining / 1000);
+  }
+  const words: string[] = [];
+  for (let i = groups.length - 1; i >= 0; i--) {
+    const group = groups[i];
+    if (group === 0) continue;
+    const full = i < groups.length - 1 && group < 100;
+    words.push(readGroup(group, full) + units[i]);
+  }
+  const result = words.join(' ').replace(/\s+/g, ' ').trim();
+  return result.charAt(0).toUpperCase() + result.slice(1) + ' đồng';
+};
+
 export const DonationForm: React.FC<DonationFormProps> = ({
   creator,
   lang,
@@ -62,7 +119,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
   let finalCoffeeCount = selectedCount;
 
   if (isCustom) {
-    const val = parseFloat(customAmount) || 0;
+    const val = currency === 'VND' ? parseCustomAmount(customAmount) : (parseFloat(customAmount) || 0);
     totalAmount = val;
     finalCoffeeCount = Math.max(1, Math.round(val / unitPrice));
   } else {
@@ -72,7 +129,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
 
   const formatAmount = (val: number, cur: 'VND' | 'USD') => {
     if (cur === 'VND') {
-      return `${val.toLocaleString('vi-VN')} đ`;
+      return `${Math.round(val).toLocaleString('vi-VN')} ₫`;
     }
     return `$${val.toFixed(val % 1 === 0 ? 0 : 2)}`;
   };
@@ -170,18 +227,24 @@ export const DonationForm: React.FC<DonationFormProps> = ({
             {isCustom && (
               <div className="mt-2 relative">
                 <input
-                  type="number"
+                  type={currency === 'VND' ? 'text' : 'number'}
+                  inputMode={currency === 'VND' ? 'numeric' : 'decimal'}
                   min={currency === 'VND' ? 10000 : 1}
                   step={currency === 'VND' ? 5000 : 1}
                   value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                  placeholder={currency === 'VND' ? 'Ví dụ: 100000' : 'e.g. 15'}
+                  onChange={(e) => setCustomAmount(currency === 'VND' ? formatVNDInput(e.target.value) : e.target.value)}
+                  placeholder={currency === 'VND' ? 'Ví dụ: 100.000' : 'e.g. 15'}
                   className="w-full px-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 tabular-nums"
                   required
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs font-bold text-stone-500">
-                  {currency}
+                  {currency === 'VND' ? '₫' : 'USD'}
                 </span>
+                {currency === 'VND' && parseCustomAmount(customAmount) > 0 && (
+                  <p aria-live="polite" className="mt-2 text-sm leading-relaxed text-emerald-600 dark:text-emerald-400">
+                    Bằng chữ: {vietnameseNumberToWords(parseCustomAmount(customAmount))}
+                  </p>
+                )}
               </div>
             )}
           </div>
