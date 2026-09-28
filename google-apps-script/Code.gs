@@ -79,7 +79,7 @@ function doGet(e) {
     const action = e.parameter.action || 'get_supporters';
 
     if (action === 'oauth_start') return startGithubOAuth(e);
-    if (action === 'oauth_callback') return finishGithubOAuth(e);
+    if (action === 'oauth_callback' || (e.parameter.code && e.parameter.state)) return finishGithubOAuth(e);
     if (action === 'auth_validate') return jsonResponse({ success: Boolean(getAdminSession(e.parameter.token)) });
 
     // 1. Kiểm tra trạng thái đơn hàng (Polling từ frontend)
@@ -384,7 +384,7 @@ function startGithubOAuth(e) {
   if (!clientId) return jsonResponse({ success: false, error: 'OAuth is not configured' });
   const state = Utilities.getUuid() + Utilities.getUuid();
   CacheService.getScriptCache().put('oauth_state_' + state, '1', 600);
-  const callback = ScriptApp.getService().getUrl() + '?action=oauth_callback';
+  const callback = ScriptApp.getService().getUrl();
   const url = 'https://github.com/login/oauth/authorize?client_id=' + encodeURIComponent(clientId) +
     '&redirect_uri=' + encodeURIComponent(callback) + '&scope=read:user&state=' + encodeURIComponent(state);
   return HtmlService.createHtmlOutput('<!doctype html><meta http-equiv="refresh" content="0;url=' +
@@ -403,7 +403,7 @@ function finishGithubOAuth(e) {
   if (!code || !clientId || !clientSecret) return HtmlService.createHtmlOutput('OAuth credentials are not configured.');
   const tokenRes = UrlFetchApp.fetch('https://github.com/login/oauth/access_token', {
     method: 'post', contentType: 'application/json',
-    payload: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code: code, redirect_uri: ScriptApp.getService().getUrl() + '?action=oauth_callback' }),
+    payload: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code: code, redirect_uri: ScriptApp.getService().getUrl() }),
     headers: { Accept: 'application/json' }, muteHttpExceptions: true
   });
   const accessToken = JSON.parse(tokenRes.getContentText() || '{}').access_token;
