@@ -40,6 +40,22 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
+  // Validate OAuth callback and clear the credential from the visible URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const token = params.get('oauth_token');
+    const username = params.get('username');
+    if (!token || !username) return;
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (!settings.googleAppsScriptUrl) return;
+    fetch(settings.googleAppsScriptUrl + '?action=auth_validate&token=' + encodeURIComponent(token))
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success) setAdminUser({ id: 'github_' + username, username, role: 'admin', authenticatedVia: 'github' });
+      })
+      .catch(() => setAdminUser(null));
+  }, []);
+
   // Use a consistent dark theme across the entire app.
   useEffect(() => {
     document.documentElement.classList.add('dark');
