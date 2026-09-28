@@ -28,7 +28,6 @@ import { Coffee, ShieldCheck, Heart, Github, BookOpen } from 'lucide-react';
 
 export default function App() {
   const [lang, setLang] = useState<Language>(() => storage.getLanguage());
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => storage.getTheme());
   const [settings, setSettings] = useState<AppSettings>(() => storage.getSettings());
   const [transactions, setTransactions] = useState<Transaction[]>(() => storage.getTransactions());
   const [logs, setLogs] = useState<ActivityLog[]>(() => storage.getActivityLogs());
@@ -41,15 +40,11 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
-  // Sync theme with DOM document element
+  // Use a consistent dark theme across the entire app.
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    storage.setTheme(theme);
-  }, [theme]);
+    document.documentElement.classList.add('dark');
+    document.documentElement.style.colorScheme = 'dark';
+  }, []);
 
   // Sync language with storage
   useEffect(() => {
@@ -77,10 +72,6 @@ export default function App() {
 
   const handleToggleLang = () => {
     setLang((prev) => (prev === 'vi' ? 'en' : 'vi'));
-  };
-
-  const handleToggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   // Submit donation from form
@@ -177,8 +168,6 @@ export default function App() {
       <Navbar
         lang={lang}
         onToggleLang={handleToggleLang}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
         onOpenAdmin={() => setShowAdmin(true)}
         onOpenGuide={() => setShowGuide(true)}
         isAdminLoggedIn={Boolean(adminUser)}
