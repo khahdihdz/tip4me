@@ -397,7 +397,7 @@ function startGithubOAuth(e) {
     'a{display:inline-block;background:#24292f;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600}</style></head>' +
     '<body><div class="card"><h2>Tiếp tục đăng nhập</h2><p>Nhấn nút bên dưới để mở GitHub và cấp quyền cho Tip4Me.</p>' +
     '<a href="' + safeUrl + '" target="_top" rel="noopener">Tiếp tục với GitHub</a></div></body></html>'
-  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  );
 }
 
 function finishGithubOAuth(e) {
