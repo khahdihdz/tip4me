@@ -31,7 +31,13 @@ class StorageService {
   getSettings(): AppSettings {
     try {
       const data = localStorage.getItem(SETTINGS_KEY);
-      return data ? JSON.parse(data) : INITIAL_SETTINGS;
+      const settings: AppSettings = data ? JSON.parse(data) : { ...INITIAL_SETTINGS };
+      // Migrate existing browser settings that were saved before the GAS URL was configured.
+      if (!settings.googleAppsScriptUrl) {
+        settings.googleAppsScriptUrl = INITIAL_SETTINGS.googleAppsScriptUrl;
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      }
+      return settings;
     } catch {
       return INITIAL_SETTINGS;
     }
