@@ -384,6 +384,11 @@ export const DonationForm: React.FC<DonationFormProps> = ({
               {t.donation.submitButton} · {formatAmount(totalAmount, currency)} ({finalCoffeeCount} ☕)
             </span>
           </button>
+          {currency === 'VND' && totalAmount > 0 && (
+            <p aria-live="polite" className="mt-2 text-center text-sm leading-relaxed text-emerald-600 dark:text-emerald-400">
+              Bằng chữ: {vietnameseNumberToWords(totalAmount)}
+            </p>
+          )}
           
           <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-stone-500 dark:text-stone-400 text-center">
             <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
