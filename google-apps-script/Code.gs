@@ -387,8 +387,17 @@ function startGithubOAuth(e) {
   const callback = ScriptApp.getService().getUrl();
   const url = 'https://github.com/login/oauth/authorize?client_id=' + encodeURIComponent(clientId) +
     '&redirect_uri=' + encodeURIComponent(callback) + '&scope=read:user&state=' + encodeURIComponent(state);
-  return HtmlService.createHtmlOutput('<!doctype html><meta http-equiv="refresh" content="0;url=' +
-    url.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"><a href="' + url + '">Continue to GitHub</a>');
+  // Apps Script serves HtmlService inside a sandboxed frame. GitHub blocks being
+  // embedded, so require a user-initiated top-level navigation instead of meta refresh.
+  const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return HtmlService.createHtmlOutput(
+    '<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<style>body{font:16px Arial,sans-serif;background:#f6f8fa;display:grid;place-items:center;min-height:90vh;margin:0}' +
+    '.card{background:#fff;padding:28px;border-radius:14px;max-width:420px;text-align:center;box-shadow:0 4px 20px #0001}' +
+    'a{display:inline-block;background:#24292f;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600}</style></head>' +
+    '<body><div class="card"><h2>Tiếp tục đăng nhập</h2><p>Nhấn nút bên dưới để mở GitHub và cấp quyền cho Tip4Me.</p>' +
+    '<a href="' + safeUrl + '" target="_top" rel="noopener">Tiếp tục với GitHub</a></div></body></html>'
+  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function finishGithubOAuth(e) {
