@@ -427,9 +427,19 @@ function finishGithubOAuth(e) {
   if (!username || allowed.indexOf(username) < 0) return HtmlService.createHtmlOutput('GitHub account is not authorized.');
   const sessionToken = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
   cache.put('admin_session_' + sessionToken, JSON.stringify({ username: username, expires: Date.now() + 21600000 }), 21600);
-  const redirectBase = 'https://khahdihdz.github.io/tip4me/#oauth_token=';
-  return HtmlService.createHtmlOutput('<!doctype html><script>location.replace(' + JSON.stringify(redirectBase) +
-    '+encodeURIComponent(' + JSON.stringify(sessionToken) + ')+"&username="+encodeURIComponent(' + JSON.stringify(username) + '));</script>Redirecting…');
+  const redirectUrl = 'https://khahdihdz.github.io/tip4me/#oauth_token=' +
+    encodeURIComponent(sessionToken) + '&username=' + encodeURIComponent(username);
+  // Apps Script runs HtmlService in a sandboxed frame. Show a user-clickable
+  // top-level link so the app opens at its real mobile viewport, not inside the frame.
+  const safeRedirectUrl = redirectUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return HtmlService.createHtmlOutput(
+    '<!doctype html><html lang="vi"><head><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<style>body{font:16px Arial,sans-serif;background:#f6f8fa;display:grid;place-items:center;min-height:90vh;margin:0;padding:16px}' +
+    '.card{background:white;padding:28px;border-radius:14px;max-width:420px;text-align:center;box-shadow:0 4px 20px #0001}' +
+    'a{display:inline-block;background:#24292f;color:white;padding:13px 20px;border-radius:8px;text-decoration:none;font-weight:600}</style></head>' +
+    '<body><div class="card"><h2>Đăng nhập thành công</h2><p>Nhấn nút bên dưới để quay lại Tip4Me và mở trang quản trị.</p>' +
+    '<a href="' + safeRedirectUrl + '" target="_top" rel="noopener">Quay lại Tip4Me</a></div></body></html>'
+  );
 }
 
 function getAdminSession(token) {
