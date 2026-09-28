@@ -152,7 +152,7 @@ function doPost(e) {
     // 4. Admin cập nhật trạng thái đơn (Override thủ công)
     if (action === 'admin_update_status') {
       const token = payload.token;
-      if (!validateAdminToken(token)) {
+      if (!getAdminSession(token)) {
         return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
       }
       return handleAdminUpdateStatus(payload);
