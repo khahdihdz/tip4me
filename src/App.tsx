@@ -31,7 +31,7 @@ export default function App() {
   const [settings, setSettings] = useState<AppSettings>(() => storage.getSettings());
   const [transactions, setTransactions] = useState<Transaction[]>(() => storage.getTransactions());
   const [logs, setLogs] = useState<ActivityLog[]>(() => storage.getActivityLogs());
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => storage.getAdminSession());
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
 
   // Modal states
   const [activeVietQR, setActiveVietQR] = useState<Transaction | null>(null);
@@ -118,26 +118,13 @@ export default function App() {
     setLogs(storage.getActivityLogs());
   };
 
-  // Admin login handlers
   const handleLoginGithub = () => {
-    // In preview environment, simulate authentic GitHub OAuth authorization
-    const user = storage.loginWithGithubDemo('developer');
-    setAdminUser(user);
-    setLogs(storage.getActivityLogs());
-  };
-
-  const handleLoginToken = (token: string): boolean => {
-    const user = storage.loginWithSecretToken(token);
-    if (user) {
-      setAdminUser(user);
-      setLogs(storage.getActivityLogs());
-      return true;
-    }
-    return false;
+    if (!settings.googleAppsScriptUrl) { window.alert('Configure Google Apps Script URL first.'); return; }
+    window.location.assign(settings.googleAppsScriptUrl + '?action=oauth_start');
   };
 
   const handleLogoutAdmin = () => {
-    storage.logoutAdmin();
+    sessionStorage.removeItem('tip4me_admin_session');
     setAdminUser(null);
     setLogs(storage.getActivityLogs());
   };
@@ -339,7 +326,6 @@ export default function App() {
         logs={logs}
         user={adminUser}
         onLoginGithub={handleLoginGithub}
-        onLoginToken={handleLoginToken}
         onLogout={handleLogoutAdmin}
       />
 
