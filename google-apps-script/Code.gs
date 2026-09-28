@@ -66,12 +66,7 @@ function setupSheets() {
   if (!props.getProperty('SEPAY_API_KEY')) {
     props.setProperty('SEPAY_API_KEY', 'sepay_sample_secret_key');
   }
-  if (!props.getProperty('ADMIN_SECRET')) {
-    props.setProperty('ADMIN_SECRET', 'admin123');
-  }
-  if (!props.getProperty('AUTHORIZED_GITHUB_USERS')) {
-    props.setProperty('AUTHORIZED_GITHUB_USERS', 'admin,developer,hoangminh-dev');
-  }
+  // OAuth settings are configured manually in Script Properties.
 
   Logger.log('Khởi tạo Google Sheets thành công!');
 }
@@ -82,6 +77,10 @@ function setupSheets() {
 function doGet(e) {
   try {
     const action = e.parameter.action || 'get_supporters';
+
+    if (action === 'oauth_start') return startGithubOAuth(e);
+    if (action === 'oauth_callback') return finishGithubOAuth(e);
+    if (action === 'auth_validate') return jsonResponse({ success: Boolean(getAdminSession(e.parameter.token)) });
 
     // 1. Kiểm tra trạng thái đơn hàng (Polling từ frontend)
     if (action === 'check_status') {
@@ -99,7 +98,7 @@ function doGet(e) {
     // 3. Admin lấy toàn bộ dữ liệu (Yêu cầu xác thực token)
     if (action === 'admin_get_data') {
       const token = e.parameter.token;
-      if (!validateAdminToken(token)) {
+      if (!getAdminSession(token)) {
         return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
       }
       const data = getAdminFullData();
@@ -380,13 +379,56 @@ function writeLog(action, details, type) {
   }
 }
 
-/**
- * Xác thực Admin Token
- */
-function validateAdminToken(token) {
+function startGithubOAuth(e) {
+  const clientId = PropertiesService.getScriptProperties().getProperty('GITHUB_CLIENT_ID');
+  if (!clientId) return jsonResponse({ success: false, error: 'OAuth is not configured' });
+  const state = Utilities.getUuid() + Utilities.getUuid();
+  CacheService.getScriptCache().put('oauth_state_' + state, '1', 600);
+  const callback = ScriptApp.getService().getUrl();
+  const url = 'https://github.com/login/oauth/authorize?client_id=' + encodeURIComponent(clientId) +
+    '&redirect_uri=' + encodeURIComponent(callback) + '&scope=read:user&state=' + encodeURIComponent(state);
+  return HtmlService.createHtmlOutput('<!doctype html><meta http-equiv="refresh" content="0;url=' +
+    url.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"><a href="' + url + '">Continue to GitHub</a>');
+}
+
+function finishGithubOAuth(e) {
   const props = PropertiesService.getScriptProperties();
-  const adminSecret = props.getProperty('ADMIN_SECRET') || 'admin123';
-  return token === adminSecret || token === 'admin123';
+  const state = String(e.parameter.state || '');
+  const cache = CacheService.getScriptCache();
+  if (!state || !cache.get('oauth_state_' + state)) return HtmlService.createHtmlOutput('Invalid or expired OAuth state.');
+  cache.remove('oauth_state_' + state);
+  const code = String(e.parameter.code || '');
+  const clientId = props.getProperty('GITHUB_CLIENT_ID');
+  const clientSecret = props.getProperty('GITHUB_CLIENT_SECRET');
+  if (!code || !clientId || !clientSecret) return HtmlService.createHtmlOutput('OAuth credentials are not configured.');
+  const tokenRes = UrlFetchApp.fetch('https://github.com/login/oauth/access_token', {
+    method: 'post', contentType: 'application/json',
+    payload: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code: code, redirect_uri: ScriptApp.getService().getUrl() }),
+    headers: { Accept: 'application/json' }, muteHttpExceptions: true
+  });
+  const accessToken = JSON.parse(tokenRes.getContentText() || '{}').access_token;
+  if (!accessToken) return HtmlService.createHtmlOutput('GitHub authorization failed.');
+  const userRes = UrlFetchApp.fetch('https://api.github.com/user', {
+    headers: { Authorization: 'Bearer ' + accessToken, Accept: 'application/vnd.github+json', 'User-Agent': 'tip4me-admin' },
+    muteHttpExceptions: true
+  });
+  const ghUser = JSON.parse(userRes.getContentText() || '{}');
+  const username = String(ghUser.login || '').toLowerCase();
+  const allowed = (props.getProperty('AUTHORIZED_GITHUB_USERS') || 'khahdihdz').split(',').map(function(x) { return x.trim().toLowerCase(); });
+  if (!username || allowed.indexOf(username) < 0) return HtmlService.createHtmlOutput('GitHub account is not authorized.');
+  const sessionToken = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  cache.put('admin_session_' + sessionToken, JSON.stringify({ username: username, expires: Date.now() + 21600000 }), 21600);
+  const redirectBase = 'https://khahdihdz.github.io/tip4me/#oauth_token=';
+  return HtmlService.createHtmlOutput('<!doctype html><script>location.replace(' + JSON.stringify(redirectBase) +
+    '+encodeURIComponent(' + JSON.stringify(sessionToken) + ')+"&username="+encodeURIComponent(' + JSON.stringify(username) + '));</script>Redirecting…');
+}
+
+function getAdminSession(token) {
+  if (!token || typeof token !== 'string') return null;
+  const raw = CacheService.getScriptCache().get('admin_session_' + token);
+  if (!raw) return null;
+  try { const session = JSON.parse(raw); return session.expires > Date.now() ? session : null; }
+  catch (err) { return null; }
 }
 
 /**
