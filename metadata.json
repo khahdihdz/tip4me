@@ -1,0 +1,6 @@
+{
+  "name": "Buy Me a Coffee VN",
+  "description": "Nền tảng ủng hộ sáng tạo Buy Me a Coffee song ngữ Việt - Anh với VietQR tự động xác nhận qua SePay và Tip4Serv quốc tế.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
