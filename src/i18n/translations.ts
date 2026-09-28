@@ -1,7 +1,7 @@
 export const translations = {
   vi: {
     nav: {
-      brand: 'Buy Me a Coffee VN',
+      brand: 'Tip4Me',
       tagline: 'Ủng hộ người sáng tạo nội dung',
       supporters: 'Người ủng hộ',
       about: 'Giới thiệu',
@@ -90,7 +90,7 @@ export const translations = {
       daysAgo: 'ngày trước',
     },
     admin: {
-      title: 'Trang Quản trị Buy Me a Coffee',
+      title: 'Quản trị Tip4Me',
       loginSubtitle: 'Đăng nhập để quản lý dòng tiền, cấu hình ngân hàng và webhook',
       loginWithGithub: 'Đăng nhập bằng GitHub',
       orUseToken: 'Hoặc đăng nhập nhanh bằng Mã Quản trị bí mật',
