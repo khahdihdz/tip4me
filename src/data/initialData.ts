@@ -49,7 +49,7 @@ export const INITIAL_SETTINGS: AppSettings = {
   sepayApiKey: 'sepay_live_sample_token_bmc_vn_2026',
   tip4servApiKey: 'tip4serv_sample_api_key_2026',
   tip4servShopUrl: 'https://tip4serv.com/cart/buymeacoffee',
-  googleAppsScriptUrl: '',
+  googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbwhETLuQ0Jl8BjvQ-w4lywLtVoHODceoigKYttiilpNH1grovoE8tJ6_K91U52SQ0hU/exec',
   authorizedGithubUsers: ['admin', 'hoangminh-dev', 'pre-hubxxx', 'developer'],
 };
 
