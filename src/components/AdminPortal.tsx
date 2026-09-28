@@ -9,7 +9,6 @@ import {
   Activity,
   LogOut,
   Github,
-  Key,
   Download,
   Search,
   CheckCircle2,
@@ -47,7 +46,6 @@ interface AdminPortalProps {
   logs: ActivityLog[];
   user: AdminUser | null;
   onLoginGithub: () => void;
-  onLoginToken: (token: string) => boolean;
   onLogout: () => void;
 }
 
@@ -62,7 +60,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   logs,
   user,
   onLoginGithub,
-  onLoginToken,
   onLogout,
 }) => {
   const t = translations[lang].admin;
@@ -72,8 +69,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'settings' | 'simulator' | 'logs'>('dashboard');
 
   // Login form state
-  const [tokenInput, setTokenInput] = useState('');
-  const [loginError, setLoginError] = useState('');
 
   // Transactions Filter
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -92,16 +87,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [simResult, setSimResult] = useState<any>(null);
 
   if (!isOpen) return null;
-
-  // Handle Token Login
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    const success = onLoginToken(tokenInput.trim());
-    if (!success) {
-      setLoginError(lang === 'vi' ? 'Mã bí mật không chính xác (Thử nhập: admin123)' : 'Invalid secret token (Try: admin123)');
-    }
-  };
 
   // If not logged in, render Admin Authentication Gate
   if (!user) {
@@ -137,44 +122,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <span>{t.loginWithGithub}</span>
             </button>
 
-            <div className="flex items-center gap-3 my-3">
-              <div className="h-px bg-stone-200 dark:bg-stone-800 flex-1" />
-              <span className="text-xs text-stone-400 uppercase tracking-wider">{lang === 'vi' ? 'Hoặc' : 'Or'}</span>
-              <div className="h-px bg-stone-200 dark:bg-stone-800 flex-1" />
-            </div>
-
-            {/* Admin Secret Token Form */}
-            <form onSubmit={handleTokenSubmit} className="space-y-3">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
-                {t.orUseToken}
-              </label>
-              <div className="relative">
-                <Key className="w-4 h-4 absolute left-3 top-3 text-stone-400" />
-                <input
-                  type="password"
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value)}
-                  placeholder={t.tokenPlaceholder}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  required
-                />
-              </div>
-
-              {loginError && (
-                <p className="text-xs text-red-500 font-medium">{loginError}</p>
-              )}
-
-              <button
-                type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors cursor-pointer"
-              >
-                {t.loginBtn}
-              </button>
-            </form>
-
-            <div className="p-3 rounded-xl bg-stone-100 dark:bg-stone-800 text-[11px] text-stone-600 dark:text-stone-400">
-              {t.demoLoginNotice}
-            </div>
+            <p className="text-xs text-center text-stone-500">Only authorized GitHub accounts can access this portal.</p>
           </div>
         </div>
       </div>
