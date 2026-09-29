@@ -790,6 +790,36 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs resize-none"
                   />
                 </div>
+                <div className="flex items-center justify-between gap-4 rounded-xl border border-stone-200 dark:border-stone-700 p-3">
+                  <div>
+                    <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+                      {lang === 'vi' ? 'Hiển thị mục tiêu cộng đồng' : 'Show community goal'}
+                    </p>
+                    <p className="text-[11px] text-stone-500 mt-1">
+                      {lang === 'vi' ? 'Bật hoặc tắt thanh tiến độ trên trang công khai.' : 'Show or hide the progress bar on the public page.'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={settingsForm.creator.goal.enabled !== false}
+                      onChange={(e) =>
+                        setSettingsForm({
+                          ...settingsForm,
+                          creator: {
+                            ...settingsForm.creator,
+                            goal: {
+                              ...settingsForm.creator.goal,
+                              enabled: e.target.checked,
+                            },
+                          },
+                        })
+                      }
+                    />
+                    <span className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300/40 dark:peer-focus:ring-amber-800/40 rounded-full peer dark:bg-stone-700 peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+                  </label>
+                </div>
                 <div>
                   <label className="block text-xs font-semibold text-stone-600 dark:text-stone-400 mb-1">
                     {lang === 'vi' ? 'Tên mục tiêu cộng đồng' : 'Community goal title'}
