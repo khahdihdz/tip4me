@@ -803,8 +803,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <input
                       type="checkbox"
                       checked={settingsForm.creator.goal.enabled !== false}
-                      onChange={(e) =>
-                        setSettingsForm({
+                      onChange={(e) => {
+                        const updatedSettings: AppSettings = {
                           ...settingsForm,
                           creator: {
                             ...settingsForm.creator,
@@ -813,8 +813,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               enabled: e.target.checked,
                             },
                           },
-                        })
-                      }
+                        };
+                        setSettingsForm(updatedSettings);
+                        // Save this toggle immediately, rather than relying on
+                        // the separate Save button at the bottom of the form.
+                        onUpdateSettings(updatedSettings);
+                        setSaveSuccess(true);
+                        window.setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
                       className="h-5 w-5 accent-amber-500 cursor-pointer"
                     />
                     <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">
