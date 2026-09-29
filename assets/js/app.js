@@ -3,7 +3,52 @@ const $ = id => document.getElementById(id);
 let orderCode = "";
 let timer = null;
 
-const fmt = n => new Intl.NumberFormat("vi-VN").format(n) + "đ";
+const fmt = n => new Intl.NumberFormat("vi-VN").format(n) + " ₫";
+const digitWords = ["không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"];
+function readThree(n, full = false) {
+  const h = Math.floor(n / 100), t = Math.floor(n / 10) % 10, u = n % 10;
+  let out = [];
+  if (h || full) out.push(digitWords[h] + " trăm");
+  if (t > 1) {
+    out.push(digitWords[t] + " mươi");
+    if (u === 1) out.push("mốt");
+    else if (u === 5) out.push("lăm");
+    else if (u) out.push(digitWords[u]);
+  } else if (t === 1) {
+    out.push("mười");
+    if (u === 5) out.push("lăm");
+    else if (u) out.push(digitWords[u]);
+  } else if (u) {
+    if (h || full) out.push("lẻ");
+    out.push(digitWords[u]);
+  }
+  return out.join(" ");
+}
+function amountToWords(value) {
+  if (!Number.isSafeInteger(value) || value < 0) return "";
+  if (value === 0) return "Không đồng";
+  const units = ["","nghìn","triệu","tỷ","nghìn tỷ","triệu tỷ"];
+  const groups = [];
+  let n = value;
+  while (n > 0) { groups.unshift(n % 1000); n = Math.floor(n / 1000); }
+  const words = [];
+  const offset = groups.length - 1;
+  groups.forEach((group, i) => {
+    if (!group) return;
+    const lowerFollows = groups.slice(i + 1).some(Boolean);
+    words.push(readThree(group, i > 0 && group < 100 && lowerFollows));
+    if (units[offset - i]) words.push(units[offset - i]);
+  });
+  const result = words.join(" ").replace(/\\s+/g, " ").trim();
+  return result.charAt(0).toLocaleUpperCase("vi-VN") + result.slice(1) + " đồng";
+}
+function parseAmount(value) { return Number(String(value).replace(/[^0-9]/g, "")); }
+function updateAmountDisplay() {
+  const input = $("amount");
+  const amount = parseAmount(input.value);
+  if (input.value.trim()) input.value = Number.isSafeInteger(amount) ? new Intl.NumberFormat("vi-VN").format(amount) : "";
+  $("amountWords").textContent = amount > 0 && Number.isSafeInteger(amount) ? amountToWords(amount) : "Nhập số tiền để xem cách đọc bằng chữ";
+}
 const showError = message => {
   const box = $("formError");
   if (box) {
@@ -15,9 +60,13 @@ const showError = message => {
 };
 const clearError = () => $("formError")?.classList.add("d-none");
 
+$("amount").addEventListener("input", updateAmountDisplay);
+updateAmountDisplay();
+
 document.querySelectorAll("[data-amount]").forEach(button => {
   button.addEventListener("click", () => {
-    $("amount").value = button.dataset.amount;
+    $("amount").value = new Intl.NumberFormat("vi-VN").format(Number(button.dataset.amount));
+    updateAmountDisplay();
     document.querySelectorAll("[data-amount]").forEach(item => item.classList.toggle("active", item === button));
   });
 });
@@ -50,7 +99,7 @@ $("donationForm").addEventListener("submit", async event => {
   event.preventDefault();
   clearError();
 
-  const amount = Number($("amount").value);
+  const amount = parseAmount($("amount").value);
   if (!Number.isSafeInteger(amount) || amount < 1000) {
     showError("Số tiền ủng hộ tối thiểu là 1.000đ.");
     return;
