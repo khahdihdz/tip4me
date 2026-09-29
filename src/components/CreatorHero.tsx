@@ -180,7 +180,7 @@ export const CreatorHero: React.FC<CreatorHeroProps> = ({
         </div>
 
         {/* Community Goal Progress Bar */}
-        <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-stone-800/90 dark:to-stone-800/60 border border-amber-200/80 dark:border-stone-700">
+        {goal.enabled !== false && <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-stone-800/90 dark:to-stone-800/60 border border-amber-200/80 dark:border-stone-700">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
@@ -210,7 +210,7 @@ export const CreatorHero: React.FC<CreatorHeroProps> = ({
               style={{ width: `${goalPercentage}%` }}
             />
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
