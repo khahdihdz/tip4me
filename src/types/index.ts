@@ -27,6 +27,7 @@ export interface CreatorProfile {
     targetCoffees: number;
     currentCoffees: number;
     title: string;
+    enabled?: boolean;
   };
   coffeePriceVND: number; // default: 35000 VND
   coffeePriceUSD: number; // default: 2.00 USD
