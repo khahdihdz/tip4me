@@ -790,19 +790,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs resize-none"
                   />
                 </div>
-                <div className="flex items-center justify-between gap-4 rounded-xl border border-stone-200 dark:border-stone-700 p-3">
-                  <div>
-                    <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
-                      {lang === 'vi' ? 'Hiển thị mục tiêu cộng đồng' : 'Show community goal'}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border-2 border-amber-200 dark:border-amber-900/60 bg-amber-50/60 dark:bg-amber-950/20 p-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-stone-800 dark:text-stone-100">
+                      {lang === 'vi' ? 'Mục tiêu cộng đồng' : 'Community goal'}
                     </p>
-                    <p className="text-[11px] text-stone-500 mt-1">
-                      {lang === 'vi' ? 'Bật hoặc tắt thanh tiến độ trên trang công khai.' : 'Show or hide the progress bar on the public page.'}
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">
+                      {lang === 'vi' ? 'Bật để hiển thị thanh tiến độ trên trang công khai, tắt để ẩn.' : 'Enable to show the progress bar on the public page, or disable to hide it.'}
                     </p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <label className="flex items-center gap-3 cursor-pointer shrink-0 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 px-3 py-2">
                     <input
                       type="checkbox"
-                      className="sr-only peer"
                       checked={settingsForm.creator.goal.enabled !== false}
                       onChange={(e) =>
                         setSettingsForm({
@@ -816,8 +815,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           },
                         })
                       }
+                      className="h-5 w-5 accent-amber-500 cursor-pointer"
                     />
-                    <span className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300/40 dark:peer-focus:ring-amber-800/40 rounded-full peer dark:bg-stone-700 peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+                    <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">
+                      {settingsForm.creator.goal.enabled !== false
+                        ? (lang === 'vi' ? 'Đang bật' : 'Enabled')
+                        : (lang === 'vi' ? 'Đang tắt' : 'Disabled')}
+                    </span>
                   </label>
                 </div>
                 <div>
