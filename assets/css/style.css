@@ -146,3 +146,32 @@ button{touch-action:manipulation}
   html{scroll-behavior:auto}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+
+
+/* Prevent viewport overflow on narrow screens and long dynamic content */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+body{min-width:0}
+.container,.page-wrap,.header-inner,.hero,.donation-grid,.panel,.stats-panel{min-width:0;max-width:100%}
+.header-inner{flex-wrap:wrap}
+.brand{min-width:0;max-width:100%}
+.brand strong,.brand small{overflow-wrap:anywhere}
+.hero-art{min-width:0;max-width:100%}
+.coffee-cup,.saucer,.beans,.steam,.thank-note{max-width:100%}
+.payment-details p{min-width:0;flex-wrap:wrap;overflow-wrap:anywhere}
+.payment-details p>*{min-width:0;max-width:100%}
+.payment-details b{word-break:break-word}
+.supporters-list,.supporters-list *{min-width:0;max-width:100%;overflow-wrap:anywhere}
+@media(max-width:767.98px){
+  .header-inner{flex-wrap:nowrap}
+  .brand{flex:1 1 auto}
+  .header-thanks{flex:0 1 auto;min-width:0}
+  .hero-copy,.hero-art,.panel{width:100%;min-width:0}
+  .payment-details p{align-items:flex-start}
+}
+@media(max-width:360px){
+  .header-inner{flex-wrap:wrap}
+  .header-thanks{display:none}
+  .panel{padding:14px}
+  .payment-details p{display:block}
+  .payment-details b{display:block;text-align:left;margin-top:3px}
+}
