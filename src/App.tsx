@@ -51,6 +51,33 @@ export default function App() {
     setAdminUser({ id: 'github_' + username, username, role: 'admin', authenticatedVia: 'github' });
   }, []);
 
+  // Restore the admin session and authoritative settings after refresh.
+  useEffect(() => {
+    const token = sessionStorage.getItem('tip4me_admin_session');
+    const currentSettings = storage.getSettings();
+    const gasUrl = currentSettings.googleAppsScriptUrl;
+    if (!token || !gasUrl) return;
+
+    fetch(`${gasUrl}?action=admin_get_settings&token=${encodeURIComponent(token)}`)
+      .then((response) => response.json())
+      .then((result) => {
+        if (!result.success) throw new Error(result.error || 'Không thể tải cấu hình');
+        if (result.settings && typeof result.settings === 'object') {
+          storage.saveSettings(result.settings as AppSettings);
+          setSettings(result.settings as AppSettings);
+        }
+        setAdminUser((current) => current || {
+          id: 'github_admin',
+          username: 'admin',
+          role: 'admin',
+          authenticatedVia: 'github',
+        });
+      })
+      .catch((error) => {
+        console.error('Google Sheets settings restore failed:', error);
+      });
+  }, []);
+
   // Use a consistent dark theme across the entire app.
   useEffect(() => {
     document.documentElement.classList.add('dark');
