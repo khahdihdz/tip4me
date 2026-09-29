@@ -144,6 +144,33 @@ export default function App() {
     storage.saveSettings(newSettings);
     setSettings(newSettings);
     setLogs(storage.getActivityLogs());
+
+    // Keep a local copy for immediate UI updates, and persist the authoritative
+    // configuration in the protected Google Sheets Settings tab.
+    const token = sessionStorage.getItem('tip4me_admin_session');
+    const gasUrl = newSettings.googleAppsScriptUrl;
+    if (!token || !gasUrl) {
+      window.alert('Cấu hình đã lưu trên trình duyệt nhưng chưa thể đồng bộ lên Google Sheets. Hãy đăng nhập quản trị và kiểm tra URL Apps Script.');
+      return;
+    }
+
+    fetch(gasUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'admin_save_settings',
+        token,
+        settings: newSettings,
+      }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (!result.success) throw new Error(result.error || 'Không thể lưu cấu hình lên Google Sheets');
+      })
+      .catch((error) => {
+        console.error('Google Sheets settings sync failed:', error);
+        window.alert('Không đồng bộ được cấu hình lên Google Sheets. Cấu hình hiện vẫn được lưu trên trình duyệt. Vui lòng kiểm tra quyền truy cập và triển khai lại Apps Script.');
+      });
   };
 
   const handleUpdateTransactionStatus = (id: string, status: TransactionStatus) => {
