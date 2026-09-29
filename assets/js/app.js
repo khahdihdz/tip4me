@@ -257,3 +257,19 @@ function esc(value) {
 }
 
 loadSummary();
+// Ngăn thao tác phóng to/thu nhỏ trang bằng cử chỉ và phím tắt.
+document.addEventListener("wheel", event => {
+  if (event.ctrlKey) event.preventDefault();
+}, { passive: false });
+document.addEventListener("keydown", event => {
+  if (event.ctrlKey || event.metaKey) {
+    const key = event.key;
+    if (key === "+" || key === "=" || key === "-" || key === "0" || key === "_" ) event.preventDefault();
+  }
+});
+document.addEventListener("touchmove", event => {
+  if (event.touches && event.touches.length > 1) event.preventDefault();
+}, { passive: false });
+["gesturestart", "gesturechange", "gestureend"].forEach(type => {
+  document.addEventListener(type, event => event.preventDefault(), { passive: false });
+});
