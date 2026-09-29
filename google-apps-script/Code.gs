@@ -82,6 +82,14 @@ function doGet(e) {
     if (action === 'oauth_callback' || (e.parameter.code && e.parameter.state)) return finishGithubOAuth(e);
     if (action === 'auth_validate') return jsonResponse({ success: Boolean(getAdminSession(e.parameter.token)) });
 
+    // Chỉ quản trị viên đã xác thực mới được đọc cấu hình đầy đủ.
+    if (action === 'admin_get_settings') {
+      if (!getAdminSession(e.parameter.token)) {
+        return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
+      }
+      return getAdminSettings();
+    }
+
     // 1. Kiểm tra trạng thái đơn hàng (Polling từ frontend)
     if (action === 'check_status') {
       const orderCode = (e.parameter.order_code || '').trim().toUpperCase();
