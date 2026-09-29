@@ -39,15 +39,24 @@ function amountToWords(value) {
     words.push(readThree(group, i > 0 && group < 100 && lowerFollows));
     if (units[offset - i]) words.push(units[offset - i]);
   });
-  const result = words.join(" ").replace(/\\s+/g, " ").trim();
+  const result = words.join(" ").replace(/\s+/g, " ").trim();
   return result.charAt(0).toLocaleUpperCase("vi-VN") + result.slice(1) + " đồng";
 }
 function parseAmount(value) { return Number(String(value).replace(/[^0-9]/g, "")); }
 function updateAmountDisplay() {
   const input = $("amount");
-  const amount = parseAmount(input.value);
-  if (input.value.trim()) input.value = Number.isSafeInteger(amount) ? new Intl.NumberFormat("vi-VN").format(amount) : "";
-  $("amountWords").textContent = amount > 0 && Number.isSafeInteger(amount) ? amountToWords(amount) : "Nhập số tiền để xem cách đọc bằng chữ";
+  const raw = input.value.replace(/[^0-9]/g, "");
+  const amount = raw === "" ? NaN : Number(raw);
+  const formatted = raw === "" ? "" : new Intl.NumberFormat("vi-VN").format(amount);
+  if (input.value !== formatted) {
+    const cursorFromEnd = input.value.length - input.selectionStart;
+    input.value = formatted;
+    const next = Math.max(0, formatted.length - cursorFromEnd);
+    input.setSelectionRange(next, next);
+  }
+  $("amountWords").textContent = Number.isSafeInteger(amount) && amount > 0
+    ? amountToWords(amount)
+    : "Nhập số tiền để xem cách đọc bằng chữ";
 }
 const showError = message => {
   const box = $("formError");
