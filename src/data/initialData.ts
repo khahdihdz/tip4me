@@ -36,6 +36,7 @@ export const INITIAL_SETTINGS: AppSettings = {
       targetCoffees: 100,
       currentCoffees: 42,
       title: 'Duy trì máy chủ demo & nâng cấp microphone ghi podcast kỹ thuật',
+      enabled: true,
     },
     coffeePriceVND: 35000,
     coffeePriceUSD: 2,
