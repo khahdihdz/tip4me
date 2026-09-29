@@ -149,6 +149,14 @@ function doPost(e) {
       return handleCreateTransaction(payload);
     }
 
+    // Admin lưu cấu hình hệ thống vào Google Sheets.
+    if (action === 'admin_save_settings') {
+      if (!getAdminSession(payload.token)) {
+        return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
+      }
+      return saveAdminSettings(payload.settings);
+    }
+
     // 4. Admin cập nhật trạng thái đơn (Override thủ công)
     if (action === 'admin_update_status') {
       const token = payload.token;
@@ -166,6 +174,33 @@ function doPost(e) {
     // Luôn giải phóng lock
     lock.releaseLock();
   }
+}
+
+
+/**
+ * Lưu cấu hình ứng dụng trong sheet Settings (chỉ admin đã xác thực).
+ * Mỗi lần lưu cập nhật dòng app_settings, không tạo bản ghi trùng.
+ */
+function saveAdminSettings(settings) {
+  if (!settings || typeof settings !== 'object') {
+    return jsonResponse({ success: false, error: 'Invalid settings' }, 400);
+  }
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_SETTINGS);
+  if (!sheet) return jsonResponse({ success: false, error: 'Settings sheet not found. Run setupSheets() first.' }, 500);
+
+  const key = 'app_settings';
+  const lastRow = sheet.getLastRow();
+  let targetRow = -1;
+  if (lastRow >= 2) {
+    const keys = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < keys.length; i++) {
+      if (String(keys[i][0]) === key) { targetRow = i + 2; break; }
+    }
+  }
+  if (targetRow < 0) targetRow = lastRow + 1;
+  sheet.getRange(targetRow, 1, 1, 2).setValues([[key, JSON.stringify(settings)]]);
+  writeLog('SETTINGS_SAVED', 'Quản trị viên đã lưu cấu hình ứng dụng vào Google Sheets', 'ADMIN');
+  return jsonResponse({ success: true, message: 'Settings saved to Google Sheets' });
 }
 
 /**
