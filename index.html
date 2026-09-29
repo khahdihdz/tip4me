@@ -1,1 +1,92 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buy me a coffee ☕</title><meta name="description" content="Ủng hộ tác giả phát triển dự án"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="assets/css/style.css"></head><body><main class="container py-4 py-md-5"><section class="cardx mx-auto"><header class="text-center"><div class="avatar">☕</div><h1 class="mt-3">Buy me a coffee</h1><p class="text-secondary">Nếu bạn thấy dự án hữu ích, hãy mời tôi một ly cà phê để tiếp thêm động lực phát triển nhé!</p></header><form id="donationForm"><label class="form-label fw-semibold">Chọn số tiền ủng hộ</label><div class="amounts mb-3"><button type="button" data-amount="10000">10.000đ</button><button type="button" data-amount="20000">20.000đ</button><button type="button" data-amount="50000">50.000đ</button><button type="button" data-amount="100000">100.000đ</button></div><label class="form-label">Số tiền tùy chỉnh (VNĐ)</label><input id="amount" class="form-control" type="text" inputmode="numeric" autocomplete="off" value="20.000" required aria-describedby="amountWords"><div id="amountWords" class="form-text mb-3" aria-live="polite">Hai mươi nghìn đồng</div><label class="form-label">Tên người ủng hộ</label><input id="name" class="form-control mb-3" maxlength="80" placeholder="Không bắt buộc"><label class="form-label">Lời nhắn</label><textarea id="message" class="form-control mb-3" rows="3" maxlength="500" placeholder="Gửi lời nhắn đến tác giả..."></textarea><button id="submit" class="btn btn-coffee w-100" type="submit">Ủng hộ ngay</button><div id="formError" class="alert alert-danger d-none mt-3 mb-0" role="alert"></div></form><section id="payment" class="d-none text-center mt-4"><h2 class="h5">Quét mã để thanh toán</h2><p class="small text-secondary">Giữ nguyên nội dung chuyển khoản để hệ thống tự động xác nhận.</p><img id="qr" class="qr" alt="QR thanh toán"><p id="qrError" class="alert alert-warning d-none mt-3">Không tải được ảnh QR. Vui lòng thử tải lại trang hoặc liên hệ tác giả để nhận thông tin chuyển khoản.</p><div class="details text-start mt-3"><p>Số tiền: <b id="payAmount"></b></p><p>Nội dung: <b id="payCode"></b></p><p>Mã giao dịch: <b id="order"></b></p></div><div id="status" class="alert alert-info">Đang chờ thanh toán...</div></section><div class="stats mt-4"><div><b id="total">—</b><small>Tổng tiền ủng hộ</small></div><div><b id="count">—</b><small>Lượt ủng hộ</small></div></div><h2 class="h5 mt-4">Lời cảm ơn gần đây</h2><div id="supporters" class="small text-secondary">Đang tải...</div><footer class="text-center small text-secondary mt-4">Cảm ơn bạn đã tiếp thêm động lực ❤️</footer></section></main><script src="assets/js/app.js?v=20260929-1325"></script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#130d09">
+  <title>Tip4Me | Mời tôi một ly cà phê</title>
+  <meta name="description" content="Ủng hộ tác giả phát triển dự án">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929-dark">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Tip4Me trang chủ">
+        <span class="brand-icon">☕</span><span><strong>Tip4Me</strong><small>Một ly cà phê nhỏ, tạo nên động lực lớn!</small></span>
+      </a>
+      <div class="header-thanks"><span>♥</span><p>Cảm ơn bạn<br>đã ủng hộ!</p></div>
+    </div>
+  </header>
+
+  <main class="container page-wrap">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">♥ &nbsp;Ủng hộ tác giả</span>
+        <h1>Cùng nhau<br>bồi dưỡng điều tốt đẹp</h1>
+        <p>Mỗi đóng góp của bạn là nguồn động lực để mình tiếp tục sáng tạo và mang đến nhiều nội dung giá trị hơn.</p>
+        <a class="hero-cta" href="#donationForm"><span>☕</span> Ủng hộ ngay <b>→</b></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="steam steam-one"></div><div class="steam steam-two"></div><div class="steam steam-three"></div>
+        <div class="coffee-cup"><div class="coffee-top"><span>☕</span></div><div class="cup-handle"></div></div>
+        <div class="saucer"></div><div class="beans">●　●　●<br>　●　●</div>
+        <div class="thank-note">Thanks<br>for your<br>support <span>⌣</span></div>
+      </div>
+    </section>
+
+    <section class="donation-grid">
+      <div class="panel amount-panel">
+        <div class="panel-title"><span class="panel-icon">▤</span><div><h2>Chọn số tiền ủng hộ</h2><p>Bạn có thể chọn nhanh hoặc nhập số tiền tùy ý.</p></div></div>
+        <form id="donationForm">
+          <div class="amounts mb-4">
+            <button type="button" data-amount="10000">10.000 ₫</button>
+            <button type="button" data-amount="20000">20.000 ₫</button>
+            <button type="button" data-amount="50000">50.000 ₫</button>
+            <button type="button" data-amount="100000">100.000 ₫</button>
+            <button type="button" class="other-amount" data-amount="50000">Khác</button>
+          </div>
+          <label class="form-label" for="amount"><span class="label-icon">✎</span> Số tiền tùy chỉnh (VNĐ)</label>
+          <input id="amount" class="form-control amount-input" type="text" inputmode="numeric" autocomplete="off" value="20.000" required aria-describedby="amountWords">
+          <div id="amountWords" class="amount-words" aria-live="polite">Hai mươi nghìn đồng</div>
+          <div class="input-note">⚡ &nbsp;Số tiền sẽ được cập nhật ngay khi bạn nhập.</div>
+          <div class="donor-fields">
+            <label class="form-label" for="name">Tên người ủng hộ <span class="optional">(không bắt buộc)</span></label>
+            <input id="name" class="form-control" maxlength="80" placeholder="Tên của bạn">
+            <label class="form-label mt-3" for="message">Lời nhắn</label>
+            <textarea id="message" class="form-control" rows="2" maxlength="500" placeholder="Gửi lời nhắn đến tác giả..."></textarea>
+          </div>
+          <button id="submit" class="btn btn-coffee w-100 mt-3" type="submit">☕ &nbsp; Tạo mã ủng hộ</button>
+          <div id="formError" class="alert alert-danger d-none mt-3 mb-0" role="alert"></div>
+        </form>
+      </div>
+
+      <section id="payment" class="panel payment-panel d-none">
+        <div class="panel-title"><span class="panel-icon">▦</span><div><h2>Quét mã để thanh toán</h2><p>Sử dụng ứng dụng ngân hàng hoặc ví điện tử để quét mã QR.</p></div></div>
+        <div class="qr-frame"><img id="qr" class="qr" alt="QR thanh toán"></div>
+        <p id="qrError" class="alert alert-warning d-none mt-3">Không tải được ảnh QR. Vui lòng thử tải lại trang hoặc liên hệ tác giả.</p>
+        <div class="payment-details">
+          <p><span>Ngân hàng</span><b>Vietcombank</b></p>
+          <p><span>Số tiền</span><b id="payAmount"></b></p>
+          <p><span>Nội dung</span><b id="payCode"></b></p>
+          <p><span>Mã giao dịch</span><b id="order"></b></p>
+        </div>
+        <div id="status" class="alert alert-info mt-3">Đang chờ thanh toán…</div>
+      </section>
+
+      <section class="panel stats-panel">
+        <div class="stat"><span>♡</span><b id="count">—</b><small>Lượt ủng hộ</small></div>
+        <div class="stat"><span>☕</span><b id="total">—</b><small>Tổng số tiền</small></div>
+        <div class="stat"><span>☆</span><b>100%</b><small>Cảm ơn bạn!</small></div>
+      </section>
+    </section>
+
+    <section class="supporters-section">
+      <h2>Lời cảm ơn gần đây</h2>
+      <div id="supporters" class="supporters-list">Đang tải...</div>
+    </section>
+    <footer class="site-footer"><p class="script-note">Cảm ơn bạn rất nhiều! <span>♥</span></p><div>Tip4Me <i>•</i> Cùng nhau tạo nên những điều tuyệt vời <i>•</i> ☕</div></footer>
+  </main>
+  <script src="assets/js/app.js?v=20260929-dark"></script>
+</body>
+</html>
