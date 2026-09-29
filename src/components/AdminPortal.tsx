@@ -792,6 +792,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-stone-600 dark:text-stone-400 mb-1">
+                    {lang === 'vi' ? 'Tên mục tiêu cộng đồng' : 'Community goal title'}
+                  </label>
+                  <input
+                    type="text"
+                    value={settingsForm.creator.goal.title}
+                    onChange={(e) =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        creator: {
+                          ...settingsForm.creator,
+                          goal: {
+                            ...settingsForm.creator.goal,
+                            title: e.target.value,
+                          },
+                        },
+                      })
+                    }
+                    placeholder={lang === 'vi' ? 'Ví dụ: Nâng cấp máy chủ' : 'e.g. Upgrade the server'}
+                    maxLength={120}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-stone-600 dark:text-stone-400 mb-1">
                     {t.settings.targetCoffees}
                   </label>
                   <input
